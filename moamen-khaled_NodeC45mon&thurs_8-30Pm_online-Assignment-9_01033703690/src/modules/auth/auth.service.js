@@ -1,12 +1,4 @@
-import {
-  ACCESS_TOKEN_EXPIRES_IN,
-  CLIENT_IDS,
-  REFRESH_TOKEN_EXPIRES_IN,
-} from "../../../config/config.service.js";
-import {
-  AudienceEnum,
-  TokenTypeEnum,
-} from "../../common/enums/security.enum.js";
+import { CLIENT_IDS } from "../../../config/config.service.js";
 import { ProviderEnum } from "../../common/enums/user.enum.js";
 import {
   BadRequestException,
@@ -18,17 +10,13 @@ import {
   compare,
   generateHash,
 } from "../../common/utils/security/hash.security.js";
-import {
-  createLoginCredentials,
-  generateToken,
-  getTokenSignture,
-} from "../../common/utils/security/token.security.js";
+import { createLoginCredentials } from "../../common/utils/security/token.security.js";
 import { create, findOne } from "../../DB/index.js";
 import { User } from "../../DB/models/user.model.js";
 import { OAuth2Client } from "google-auth-library";
-import { OTP } from "../../DB/models/otp.model.js";
 import { sendEmail } from "../../common/utils/email/email.service.js";
 import { generateOtp } from "../../common/utils/security/otp.security.js";
+import { OTP } from "../../DB/models/otp.model.js";
 
 //signup
 export const signup = async (inputs) => {
@@ -48,20 +36,6 @@ export const signup = async (inputs) => {
     data: [
       { username, email, password: hashPassword, gender, phone: ecryptPhone },
     ],
-  });
-
-  const otp = generateOtp();
-  const otpHash = await generateHash({ text: otp });
-
-  await create({
-    model: OTP,
-    data: [{ email, otpHash, expiresAt: Date.now() + 10 * 60 * 1000 }], // 10 minutes
-  });
-
-  await sendEmail({
-    to: email,
-    subject: "Verify your account",
-    html: `<h1>Your OTP is ${otp}</h1>`,
   });
 
   return user;
@@ -130,6 +104,29 @@ export const signupWithGmail = async ({ idToken }) => {
         confirmEmail: new Date(),
       },
     ],
+  });
+
+  const otp = generateOtp();
+  const otpHash = await generateHash({ text: otp });
+  await create({
+    model: OTP,
+    data: [
+      {
+        email: payload.email,
+        otpHash,
+        // expiresAt: Date.now() + 10 * 60 * 1000,
+      },
+    ],
+  });
+  await sendEmail({
+    to: payload.email,
+    subject: "verify your account",
+    html: `
+      <h2>Email Verification</h2>
+      <p>Your OTP is:</p>
+      <h1>${otp}</h1>
+      <p>Expires in 10 minutes</p>
+    `,
   });
 
   return await createLoginCredentials(newUser);

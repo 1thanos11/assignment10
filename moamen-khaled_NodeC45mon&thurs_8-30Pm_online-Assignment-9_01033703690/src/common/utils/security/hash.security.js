@@ -12,3 +12,5 @@ export const compare = async ({ plaintext, hash }) => {
 
   return compareResult;
 };
+
+

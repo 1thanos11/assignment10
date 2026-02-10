@@ -101,6 +101,10 @@ const userSchema = new mongoose.Schema(
   },
 );
 
+//indexes
+userSchema.index({ firstName: 1 });
+userSchema.index({ lastName: 1 });
+
 //username
 userSchema
   .virtual("username")

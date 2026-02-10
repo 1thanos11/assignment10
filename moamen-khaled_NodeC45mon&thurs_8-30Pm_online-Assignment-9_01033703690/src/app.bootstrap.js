@@ -1,9 +1,10 @@
 import express from "express";
+import cors from "cors";
+
 import { connectDB } from "./DB/connection.db.js";
 import { PORT } from "../config/config.service.js";
 import { GlobalErrorException } from "./common/utils/response/error.response.js";
-import { authRouter, userRouter } from "./modules/index.js";
-import cors from "cors";
+import { authRouter, otpRouter, userRouter } from "./modules/index.js";
 
 async function bootstrap() {
   await connectDB();
@@ -14,6 +15,7 @@ async function bootstrap() {
   //routers
   app.use("/auth", authRouter);
   app.use("/user", userRouter);
+  app.use("/otp", otpRouter);
 
   //global error handling
   app.use(GlobalErrorException);

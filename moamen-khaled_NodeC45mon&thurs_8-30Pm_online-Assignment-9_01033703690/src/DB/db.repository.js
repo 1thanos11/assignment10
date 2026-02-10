@@ -34,3 +34,8 @@ export const findById = async ({
   }
   return await doc.exec();
 };
+
+//delete
+export const deleteOne = async ({ model, filter = {}, options = {} } = {}) => {
+  await model.deleteOne(filter);
+};

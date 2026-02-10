@@ -1,13 +1,7 @@
 import nodemailer from "nodemailer";
-import { EMAIL_USER, EMAIL_PASS } from "../../../../config/config.service.js";
+import { EMAIL_PASS, EMAIL_USER } from "../../../../config/config.service.js";
 
-export const sendEmail = async ({
-  to,
-  subject,
-  text,
-  html,
-  attachments = [],
-} = {}) => {
+export const sendEmail = async ({ to, subject, html }) => {
   const transporter = nodemailer.createTransport({
     service: "gmail",
     auth: {
@@ -16,14 +10,10 @@ export const sendEmail = async ({
     },
   });
 
-  const info = await transporter.sendMail({
-    from: `"Saraha App" <${EMAIL_USER}>`,
-    to: to ? to : "",
-    subject: subject ? subject : "Hello",
-    text: text ? text : "",
-    html: html ? html : "",
-    attachments: attachments ? attachments : [],
+  await transporter.sendMail({
+    from: `""Saraha" ${EMAIL_USER}`,
+    to,
+    subject,
+    html,
   });
-
-  return info;
 };

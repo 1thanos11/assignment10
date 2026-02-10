@@ -11,7 +11,6 @@ import {
 } from "../../../../config/config.service.js";
 import {
   BadRequestException,
-  NotFoundException,
   UnAuthorizedException,
 } from "../response/error.response.js";
 import { User } from "../../../DB/models/user.model.js";
@@ -101,6 +100,9 @@ export const decodeToken = async ({
   token,
   tokenType = TokenTypeEnum.Access,
 } = {}) => {
+  if (!token) {
+    return BadRequestException("token is required");
+  }
   const decode = jwt.decode(token);
   if (!decode?.aud?.length) {
     return BadRequestException("fail to decode this token");
@@ -121,8 +123,6 @@ export const decodeToken = async ({
   const user = await findById({
     model: User,
     id: verifiedData.sub,
-    select: "-email -password",
-    options: { lean: true },
   });
   if (!user) {
     return UnAuthorizedException("Register and login first");

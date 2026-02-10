@@ -1,24 +1,21 @@
 import mongoose from "mongoose";
 
-const otpSchema = new mongoose.Schema(
-  {
-    email: {
-      type: String,
-      required: true,
-    },
-    otpHash: {
-      type: String,
-      required: true,
-    },
-    expiresAt: {
-      type: Date,
-    },
+const otpSchema = new mongoose.Schema({
+  email: {
+    type: String,
+    required: true,
   },
-  {
-    timestamps: true,
+  otpHash: {
+    type: String,
+    required: true,
   },
-);
+  expiresAt: {
+    type: Date,
+    required: true,
+    default: new Date(),
+  },
+});
 
-otpSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 300 });
+otpSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 60 * 10 });
 
 export const OTP = mongoose.model("OTP", otpSchema);
